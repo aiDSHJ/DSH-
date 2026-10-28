@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DSH 核心死规矩技能创建指南与操作规范</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --accent-light: #60a5fa;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --success: #10b981;
+      --code-bg: #090d16;
+      --tag-bg: #1e3a8a;
+      --tag-text: #93c5fd;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 30px 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    header {
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    h1 span.badge {
+      font-size: 13px;
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: normal;
+    }
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 8px;
+    }
+    .field-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      transition: border-color 0.2s;
+    }
+    .field-card:hover {
+      border-color: #475569;
+    }
+    .field-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .field-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--accent-light);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .field-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .copy-btn {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .copy-btn:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+    }
+    .copy-btn.copied {
+      background: var(--success);
+    }
+    .code-box {
+      background: var(--code-bg);
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 13px;
+      color: #e2e8f0;
+      white-space: pre-wrap;
+      word-break: break-all;
+      line-height: 1.5;
+      position: relative;
+      user-select: all;
+    }
+    .code-box.large {
+      max-height: 380px;
+      overflow-y: auto;
+      font-size: 12.5px;
+    }
+    .notice-card {
+      background: rgba(59, 130, 246, 0.08);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 30px;
+    }
+    .notice-card h2 {
+      font-size: 16px;
+      color: var(--accent-light);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .notice-card ol {
+      padding-left: 20px;
+      font-size: 13.5px;
+      color: #cbd5e1;
+    }
+    .notice-card li {
+      margin-bottom: 8px;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      color: #64748b;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>DSH 技能中心：防死循环行为准则配置表 <span class="badge">首次创建专用</span></h1>
+      <p class="subtitle">对照 DSH Desktop 的「技能中心 ➔ 创建」界面逐项复制粘贴，可一次性规范并彻底杜绝 Agent 无脑自嗨、跑测速脚本与死循环探针行为。</p>
+    </header>
+
+    <!-- 1. 创建位置 -->
+    <div class="field-card">
+      <div class="field-header">
+        <span class="field-title">① 创建位置（下拉框选择）</span>
+        <span class="field-hint">选全局生效位置，所有工作区通用</span>
+      </div>
+      <div class="code-box">用户技能 (~/.dsh/skills, 所有项目可用)</div>
+    </div>
+
+    <!-- 2. 技能名 -->
+    <div class="field-card">
+      <div class="field-header">
+        <span class="field-title">② 技能名 (kebab-case，唯一不冲突)</span>
+        <button class="copy-btn" onclick="copyText('skill-name-val', this)">📋 一键复制</button>
+      </div>
+      <div class="code-box" id="skill-name-val">disciplined-workflow-guard</div>
+      <p style="font-size: 12px; color: #94a3b8; margin-top: 8px;">说明：全称为“克制工作流护栏”，已排查过本地技能库与市场，保证绝对唯一且具备标准规范性。</p>
+    </div>
+
+    <!-- 3. 描述 -->
+    <div class="field-card">
+      <div class="field-header">
+        <span class="field-title">③ 描述 (模型判断触发条件的依据)</span>
+        <button class="copy-btn" onclick="copyText('skill-desc-val', this)">📋 一键复制</button>
+      </div>
+      <div class="code-box" id="skill-desc-val">当用户进行问题咨询、配置询问、原理排查、或执行任何代码修改与系统运维任务时触发。强制要求Agent严格遵守防无脑死循环铁律：咨询问答只用文字直接回答原理和步骤、严禁编写测速/扫描脚本、报错2次立即熔断、单轮工具调用不超过5步、面对复杂任务先规划后执行。</div>
+    </div>
+
+    <!-- 4. 适用场景 -->
+    <div class="field-card">
+      <div class="field-header">
+        <span class="field-title">④ 适用场景 (可选)</span>
+        <button class="copy-btn" onclick="copyText('skill-scene-val', this)">📋 一键复制</button>
+      </div>
+      <div class="code-box" id="skill-scene-val">日常提问、故障排查、配置询问、代码开发、服务拉起、节点测速咨询。防止 Agent 在后台自作主张跑长耗时探针和死循环消耗 Token。</div>
+    </div>
+
+    <!-- 5. 指令内容 -->
+    <div class="field-card">
+      <div class="field-header">
+        <span class="field-title">⑤ 指令内容 (SKILL.md 正文，Markdown)</span>
+        <button class="copy-btn" onclick="copyText('skill-content-val', this)">📋 一键复制全部正文</button>
+      </div>
+      <div class="code-box large" id="skill-content-val">---
+name: disciplined-workflow-guard
+description: 核心行为红线与克制工作流卫士，彻底防止 Agent 无脑死循环、暗箱跑批与巨量烧 Token
+---
+
+# 核心铁律：禁止无脑自嗨与长耗时死循环
+
+## 1. 咨询与提问类任务【纯文字优先，严禁动手写脚本】
+- 凡是用户询问原理、排查原因、询问配置方式、索取操作步骤时（例如包含“为什么...”、“怎么更换/配置...”、“帮我找回/分析...”、“有哪些方法...”、“怎么拉起服务...”等）：
+- **绝对禁止编写 Python/Shell/PowerShell 脚本！**
+- **绝对禁止在后台发起批量网络测速、端口扫描、多线程探测或长耗时后台任务！**
+- **必须直接用清晰、排版整齐的简体中文直接回答原因、原理以及用户可在客户端手动执行的极简操作步骤！**
+
+## 2. 报错立即熔断【严禁自我修复死循环 (Self-healing Loop Trap)】
+- 工具调用（无论是命令执行、文件读取还是脚本运行）若连续失败 **2 次**，**必须立即强制停止工具调用**！
+- 严禁自行修改代码反复盲目重试，必须停下来如实向用户展示报错信息，并给出分析与建议，等待用户决策。
+
+## 3. 单轮步数克制【防暴走烧 Token】
+- 单轮任务中连续调用工具不得超过 **5 步**。
+- 每完成 2~3 个操作，必须向用户汇报当前事实与阶段性进展，严禁在后台暗箱连续运行几十步、耗费几分钟而不向用户输出正文。
+
+## 4. 专业工作机制逻辑 (Standard Agentic Workflow)
+在执行任何代码编写、系统修改或多步骤任务时，必须严格按照以下标准化机制干活：
+1. **先规划，后行动 (Plan First)**：
+   - 面对多步骤任务，在动工前先简短清晰地告知用户：“我将分以下几步执行：第 1 步... 第 2 步... 第 3 步...”；
+2. **最小侵入原则 (Minimal Intervention)**：
+   - 优先查阅现有文件与文档，不要随意新建大量临时探针脚本（如 probe.py、test.py 等）；
+   - 如果确实需要生成临时文件，任务结束后必须主动随手清理干净，保持工作区清爽；
+3. **绝对安全边界 (Safety Boundaries)**：
+   - 严禁擅自修改、注入或删除用户的第三方软件数据（如 v2rayN、Clash、OmniRoute、数据库 storage.sqlite 等）；
+   - 严禁无明确指名路径的静默批量删除；
+   - 用户的重要配置文件、记忆文件必须 100% 隔离保护，绝不为了省空间而误删关键数据。
+
+## 5. 语言与沟通规范
+- 请始终使用**简体中文**与用户沟通。
+- 解释命令、排查 Node/pnpm/插件问题时必须使用简体中文。
+- 态度端正、回答精准、直击要害，绝不堆砌无意义的废话。
+</div>
+    </div>
+
+    <!-- 创建后续注意事项 -->
+    <div class="notice-card">
+      <h2>💡 点击「创建技能」后的后续必知事项</h2>
+      <ol>
+        <li><strong>热扫描生效机制</strong>：点击按钮后，DSH 会提示 <em>“创建后立即生效 (skill-filesystem 会热扫描)”</em>。这意味着不需要重启 DSH，系统后台守护进程已自动感知并载入该技能。</li>
+        <li><strong>自然语言自动触发</strong>：由于我们在「描述」中精准写明了触发场景，以后你在任何对话中提问、问配置、问步骤时，大模型在分析请求阶段就会命中该技能，自动戴上“紧箍咒”，只用文字老实作答。</li>
+        <li><strong>手动显式调用（快捷指令）</strong>：如果遇到特别容易引起大模型自嗨的任务（比如网络连通性、复杂环境配置排查），你可以在提问时输入 <code>/disciplined-workflow-guard</code>，或者点击输入框上方的 <code>+ 技能</code> 按钮直接手动勾选挂载它。</li>
+        <li><strong>4080 电脑同步</strong>：本地创建完成后，该技能文件会保存在 <code>~/.dsh/skills/disciplined-workflow-guard/SKILL.md</code>，如需在 4080 电脑上同样拥有该技能面板，可随时将该文件夹同步至 4080 主机的相同目录。</li>
+      </ol>
+    </div>
+
+    <div class="footer">
+      生成时间：2026-10-29 · 专为 DeepSeek Harness Desktop 深度定制
+    </div>
+  </div>
+
+  <script>
+    function copyText(elementId, button) {
+      const text = document.getElementById(elementId).innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const originalText = button.innerHTML;
+        button.innerHTML = '✅ 已复制到剪贴板！';
+        button.classList.add('copied');
+        setTimeout(() => {
+          button.innerHTML = originalText;
+          button.classList.remove('copied');
+        }, 2000);
+      }).catch(err => {
+        alert('复制失败，请手动选择复制');
+      });
+    }
+  </script>
+</body>
+</html>
